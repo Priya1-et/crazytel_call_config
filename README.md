@@ -23,4 +23,4 @@ No IAGU hostnames or `iagu-trunk` identifiers appear in this tree.
 
 - Default WebRTC PJSIP user is **`venus`** (matches `VITE_SIP_USERNAME` in the frontend).
 - The UI default **“Call from”** list is **`0290178400`–`0290178499`**. Override with **`VITE_VERIFIED_OUTBOUND_NUMBERS`** (comma-separated) if needed. Asterisk **`ALLOWED_OUTBOUND_PATTERN`** must allow the same set (default: `^02901784[0-9][0-9]$`).
-- **Crazytel trunk** uses **IP authentication** (like IAGU): PBX public IP **`223.178.215.86`** must be allowlisted at Crazytel; trunk host **`sip.crazytel.net.au`**; endpoint **`crazytel-trunk`**; no SIP registration. Optional username/password blocks are commented in `pjsip.conf` if your account requires them instead.
+- **Crazytel trunk** uses **IP authentication** (like IAGU): PBX public IP **`223.178.215.86`** must be allowlisted at Crazytel; trunk host **`sip.biz.crazytel.net.au`**; endpoint **`crazytel-trunk`**; no SIP registration. Optional username/password blocks are commented in `pjsip.conf` if your account requires them instead.

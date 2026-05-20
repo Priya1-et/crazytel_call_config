@@ -10,10 +10,10 @@ Fill these from the **Crazytel portal** / support. Nothing from IAGU should be c
 
 ## SIP trunk (Asterisk `pjsip.conf`) — configured for IP auth (IAGU-style)
 
-- [x] **SIP host** `sip.crazytel.net.au` on `[crazytel-trunk]` aor `contact=` (replaces `iagu.net`).
+- [x] **SIP host** `sip.biz.crazytel.net.au` on `[crazytel-trunk]` aor `contact=` (replaces `iagu.net`).
 - [ ] **Crazytel portal**: allowlist PBX public IP **`223.178.215.86`** (required for IP trunk).
-- [ ] **Non-default port** on trunk: change `contact=sip:sip.crazytel.net.au:PORT` if portal shows not 5060.
-- [ ] **Inbound identify**: `match=sip.crazytel.net.au` **and** uncomment/add Crazytel **SBC IP** `match=` lines in `pjsip.conf` (hostname alone is often insufficient).
+- [ ] **Non-default port** on trunk: change `contact=sip:sip.biz.crazytel.net.au:PORT` if portal shows not 5060.
+- [ ] **Inbound identify**: `match=sip.biz.crazytel.net.au` **and** uncomment/add Crazytel **SBC IP** `match=` lines in `pjsip.conf` (hostname alone is often insufficient).
 - [ ] **International** outbound enabled on Crazytel account if using `0011…` dial patterns.
 - [ ] **Username/password trunk** only if Crazytel rejects IP auth — use commented blocks in `pjsip.conf`.
 - [x] **Codecs**: trunk **ulaw/alaw**; WebRTC **Opus + ulaw** on `venus`.
