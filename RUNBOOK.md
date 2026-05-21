@@ -18,6 +18,8 @@
 ## Sanity checks
 
 ```bash
+sudo bash deploy/install-local-asterisk.sh
+
 sudo asterisk -rx "pjsip show endpoints"
 sudo asterisk -rx "pjsip show endpoint venus"
 sudo asterisk -rx "pjsip show endpoint crazytel-trunk"
