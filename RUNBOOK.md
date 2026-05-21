@@ -4,7 +4,7 @@
 
 1. **Firewall** — coturn (if used), Asterisk WSS `8089` / WS `8088`, RTP `10000-20000`, UDP SIP to Crazytel.
 2. **coturn** (optional) — see [STUN vs coturn](#stun-vs-coturn) below.
-3. **Asterisk** — copy `asterisk/*.conf` to `/etc/asterisk/` (or includes). Set `[venus-auth]` password = FE `VITE_SIP_PASSWORD`. Reload PJSIP + dialplan.
+3. **Asterisk** — `sudo bash deploy/install-local-asterisk.sh` (pjsip + **http.conf** for WSS **8089**). FE: `VITE_SIP_WSS_URL=wss://HOST:8089/ws`.
 4. **Backend** — `cd crazytel_calling_be && cp .env.example .env && npm run start:dev` (port **3001**).
 5. **Frontend** — `cd crazytel_calling_fe && cp .env.example .env && npm run dev` (port **5173**).
 

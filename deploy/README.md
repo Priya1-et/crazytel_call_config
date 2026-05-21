@@ -2,7 +2,8 @@
 
 Installs **only** these files on the host (with timestamped backup under `/etc/asterisk/crazytel-backup-*`):
 
-- `pjsip.conf` — replaces old test users (`kartik` / `1001`) with `venus` + `crazytel-trunk`
+- `pjsip.conf` — `venus` (WSS **8089**) + `crazytel-trunk` (UDP **5060**)
+- `http.conf` — TLS WebSocket on **8089** (required for WSS)
 - `extensions.conf` — Crazytel dialplan
 - `rtp.conf` — RTP range + NAT
 
@@ -24,7 +25,8 @@ sudo cp -a /etc/asterisk/pjsip.conf /etc/asterisk/extensions.conf /etc/asterisk/
 sudo cp asterisk/pjsip.conf /etc/asterisk/pjsip.conf
 sudo cp asterisk/extensions.conf /etc/asterisk/extensions.conf
 sudo cp asterisk/rtp.conf /etc/asterisk/rtp.conf
-sudo chown asterisk:asterisk /etc/asterisk/pjsip.conf /etc/asterisk/extensions.conf /etc/asterisk/rtp.conf
+sudo cp asterisk/http.conf /etc/asterisk/http.conf
+sudo chown asterisk:asterisk /etc/asterisk/pjsip.conf /etc/asterisk/extensions.conf /etc/asterisk/rtp.conf /etc/asterisk/http.conf
 sudo asterisk -rx "dialplan reload"
 sudo asterisk -rx "module reload res_pjsip.so"
 sudo asterisk -rx "pjsip show endpoints"
