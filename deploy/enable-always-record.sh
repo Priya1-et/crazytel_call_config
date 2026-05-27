@@ -101,8 +101,8 @@ echo ""
 echo "=== Verification ==="
 asterisk -rx "dialplan show globals" | grep -E "RECORDINGS_BASE|ENABLE_MIXMONITOR" || true
 
-if asterisk -rx "dialplan show from-webrtc" 2>&1 | grep -q "B(sub-start-outbound-record"; then
-  echo "OK: outbound recording uses Dial B (venus leg, X-Record-Call)"
+if asterisk -rx "dialplan show from-webrtc" 2>&1 | grep -q "U(sub-start-outbound-record"; then
+  echo "OK: outbound recording uses Dial U (on answer)"
 else
   echo "WARN: check dialplan: asterisk -rx \"dialplan show from-webrtc\""
 fi
