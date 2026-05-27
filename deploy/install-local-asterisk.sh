@@ -29,6 +29,11 @@ chown asterisk:asterisk "${FILES[@]/#/${ETC}/}"
 chmod 640 "${FILES[@]/#/${ETC}/}"
 echo "Installed Crazytel configs from ${ROOT}/asterisk/"
 
+mkdir -p /var/spool/asterisk/recordings/incoming /var/spool/asterisk/recordings/outgoing
+chown -R asterisk:asterisk /var/spool/asterisk/recordings
+chmod 750 /var/spool/asterisk/recordings
+echo "Recording dirs: /var/spool/asterisk/recordings/{incoming,outgoing}"
+
 if ! systemctl is-active --quiet asterisk 2>/dev/null; then
   echo "Starting asterisk service..."
   systemctl start asterisk
