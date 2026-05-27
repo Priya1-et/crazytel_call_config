@@ -36,7 +36,14 @@ sudo asterisk -rx "pjsip show registrations"
 2. **Inbound** — call a Crazytel DID; UI rings; Accept.
 3. **Events** — Network tab: `POST http://localhost:3001/v1/asterisk/events` → **201**.
 
-## DND note
+## Call recording (MixMonitor)
+
+- **Outbound / inbound:** App modal **Yes** sends `X-Record-Call: 1` (`fe/src/utils/sipHeaders.ts`). **No** omits the header — Asterisk does **not** record.
+- **Outbound:** `Dial(...,B(sub-start-outbound-record^s^1))` runs on **venus** when the PSTN answers → header is readable; **AMD** avoids recording most voicemail when you chose Yes.
+- **Inbound:** `Dial(...,U(sub-start-inbound-record...))` when consultant answers; recording only if Accept included the header.
+- **Fallback (no modal):** In `extensions.conf` `[globals]`, uncomment `RECORD_ALL_OUT=1` to record every outbound answer (still uses AMD). Reload dialplan after edit.
+- **Paths:** `RECORDINGS_BASE=/var/spool/asterisk/recordings` — dirs `incoming/`, `outgoing/`; deploy scripts set `chmod 755` and `chown asterisk`. Backend user needs read access to list/play (see BE `RECORDINGS_DIR`).
+- **Modules:** `app_mixmonitor.so` + `app_amd.so` in `asterisk/modules.conf`.
 
 Dialplan `[check-dnd]` reads Asterisk DB `dnd/venus`. BE `PUT /v1/dnd/venus` updates Nest memory/Postgres only until you sync to Asterisk DB (e.g. deploy script / AMI). FE DND UI is optional.
 
