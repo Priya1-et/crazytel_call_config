@@ -31,7 +31,7 @@ echo "Installed Crazytel configs from ${ROOT}/asterisk/"
 
 mkdir -p /var/spool/asterisk/recordings/incoming /var/spool/asterisk/recordings/outgoing
 chown -R asterisk:asterisk /var/spool/asterisk/recordings
-chmod 750 /var/spool/asterisk/recordings
+chmod 755 /var/spool/asterisk/recordings /var/spool/asterisk/recordings/incoming /var/spool/asterisk/recordings/outgoing
 echo "Recording dirs: /var/spool/asterisk/recordings/{incoming,outgoing}"
 
 if ! systemctl is-active --quiet asterisk 2>/dev/null; then
