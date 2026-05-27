@@ -52,7 +52,7 @@ if [[ -f "${SRC_MOD}" ]]; then
   cp "${SRC_MOD}" "${DST_MOD}"
   chown asterisk:asterisk "${DST_MOD}"
   chmod 640 "${DST_MOD}"
-echo "Installed: ${DST_MOD} (app_mixmonitor + app_amd)"
+  echo "Installed: ${DST_MOD} (app_mixmonitor)"
 fi
 
 mkdir -p "${RECORDINGS}/incoming" "${RECORDINGS}/outgoing"
@@ -77,14 +77,7 @@ load_module() {
 }
 
 load_module app_mixmonitor
-load_module app_amd
 load_module format_wav
-
-if ! asterisk -rx "core show application AMD" 2>&1 | grep -q "AMD"; then
-  echo "WARN: AMD not loaded — outbound voicemail filter disabled. Try: module load app_amd.so"
-else
-  echo "OK: AMD available"
-fi
 
 if ! asterisk -rx "core show application MixMonitor" 2>&1 | grep -q "MixMonitor"; then
   echo ""
