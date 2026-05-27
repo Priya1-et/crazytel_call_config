@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy always-on MixMonitor dialplan + recording dirs (temporary testing).
+# Deploy record-on-answer MixMonitor dialplan + recording dirs.
 # Also ensures app_mixmonitor.so is loaded (fixes "No application MixMonitor" / 603).
 #
 # On server (after git pull):
@@ -28,8 +28,8 @@ if [[ ! -f "${SRC_EXT}" ]]; then
   exit 1
 fi
 
-if ! grep -q "recording ALWAYS ON" "${SRC_EXT}"; then
-  echo "FAIL: repo extensions.conf does not look like always-on recording build."
+if ! grep -q "sub-start-outbound-record" "${SRC_EXT}"; then
+  echo "FAIL: repo extensions.conf missing record-on-answer subroutine."
   echo "      Pull latest code or check asterisk/extensions.conf"
   exit 1
 fi
@@ -94,8 +94,8 @@ echo ""
 echo "=== Verification ==="
 asterisk -rx "dialplan show globals" | grep -E "RECORDINGS_BASE|ENABLE_MIXMONITOR" || true
 
-if asterisk -rx "dialplan show from-webrtc" 2>&1 | grep -q "ALWAYS ON"; then
-  echo "OK: from-webrtc has always-on recording"
+if asterisk -rx "dialplan show from-webrtc" 2>&1 | grep -q "sub-start-outbound-record"; then
+  echo "OK: from-webrtc uses record-on-answer (Dial U)"
 else
   echo "WARN: check dialplan: asterisk -rx \"dialplan show from-webrtc\""
 fi
