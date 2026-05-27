@@ -7,7 +7,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ETC="/etc/asterisk"
 TS="$(date +%Y%m%d-%H%M%S)"
 BK="${ETC}/crazytel-backup-${TS}"
-FILES=(pjsip.conf extensions.conf rtp.conf http.conf)
+FILES=(pjsip.conf extensions.conf modules.conf rtp.conf http.conf)
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "Re-run with sudo: sudo bash $0"

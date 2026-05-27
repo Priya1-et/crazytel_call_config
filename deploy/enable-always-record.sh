@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy always-on MixMonitor dialplan + recording dirs (temporary testing).
-# Safe: backs up /etc/asterisk/extensions.conf before overwrite.
+# Also ensures app_mixmonitor.so is loaded (fixes "No application MixMonitor" / 603).
 #
 # On server (after git pull):
 #   cd ~/Desktop/Crazytel_Calling/crazytel_call_config
@@ -9,10 +9,13 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ETC="/etc/asterisk"
-SRC="${ROOT}/asterisk/extensions.conf"
-DST="${ETC}/extensions.conf"
+SRC_EXT="${ROOT}/asterisk/extensions.conf"
+SRC_MOD="${ROOT}/asterisk/modules.conf"
+DST_EXT="${ETC}/extensions.conf"
+DST_MOD="${ETC}/modules.conf"
 TS="$(date +%Y%m%d-%H%M%S)"
-BK="${ETC}/extensions.conf.bak-always-record-${TS}"
+BK_EXT="${ETC}/extensions.conf.bak-always-record-${TS}"
+BK_MOD="${ETC}/modules.conf.bak-always-record-${TS}"
 RECORDINGS="/var/spool/asterisk/recordings"
 
 if [[ "$(id -u)" -ne 0 ]]; then
@@ -20,26 +23,37 @@ if [[ "$(id -u)" -ne 0 ]]; then
   exit 1
 fi
 
-if [[ ! -f "${SRC}" ]]; then
-  echo "FAIL: missing ${SRC}"
+if [[ ! -f "${SRC_EXT}" ]]; then
+  echo "FAIL: missing ${SRC_EXT}"
   exit 1
 fi
 
-if ! grep -q "recording ALWAYS ON" "${SRC}"; then
+if ! grep -q "recording ALWAYS ON" "${SRC_EXT}"; then
   echo "FAIL: repo extensions.conf does not look like always-on recording build."
   echo "      Pull latest code or check asterisk/extensions.conf"
   exit 1
 fi
 
-if [[ -f "${DST}" ]]; then
-  cp -a "${DST}" "${BK}"
-  echo "Backed up: ${BK}"
+if [[ -f "${DST_EXT}" ]]; then
+  cp -a "${DST_EXT}" "${BK_EXT}"
+  echo "Backed up: ${BK_EXT}"
 fi
 
-cp "${SRC}" "${DST}"
-chown asterisk:asterisk "${DST}"
-chmod 640 "${DST}"
-echo "Installed: ${DST}"
+cp "${SRC_EXT}" "${DST_EXT}"
+chown asterisk:asterisk "${DST_EXT}"
+chmod 640 "${DST_EXT}"
+echo "Installed: ${DST_EXT}"
+
+if [[ -f "${SRC_MOD}" ]]; then
+  if [[ -f "${DST_MOD}" ]]; then
+    cp -a "${DST_MOD}" "${BK_MOD}"
+    echo "Backed up: ${BK_MOD}"
+  fi
+  cp "${SRC_MOD}" "${DST_MOD}"
+  chown asterisk:asterisk "${DST_MOD}"
+  chmod 640 "${DST_MOD}"
+  echo "Installed: ${DST_MOD} (includes app_mixmonitor.so)"
+fi
 
 mkdir -p "${RECORDINGS}/incoming" "${RECORDINGS}/outgoing"
 chown -R asterisk:asterisk "${RECORDINGS}"
@@ -52,9 +66,27 @@ if ! systemctl is-active --quiet asterisk 2>/dev/null; then
   sleep 2
 fi
 
-if ! asterisk -rx "module show like mixmonitor" 2>&1 | grep -q "app_mixmonitor.so"; then
-  echo "WARN: app_mixmonitor.so not loaded — check modules.conf"
+load_module() {
+  local mod="$1"
+  if asterisk -rx "module show like ${mod}" 2>&1 | grep -qE "${mod}\.so.*Running"; then
+    echo "OK: ${mod}.so already running"
+    return 0
+  fi
+  echo "Loading ${mod}.so ..."
+  asterisk -rx "module load ${mod}.so" || true
+}
+
+load_module app_mixmonitor
+load_module format_wav
+
+if ! asterisk -rx "core show application MixMonitor" 2>&1 | grep -q "MixMonitor"; then
+  echo ""
+  echo "FAIL: MixMonitor still not available."
+  echo "      Try: sudo systemctl restart asterisk"
+  echo "      Then re-run this script."
+  exit 1
 fi
+echo "OK: MixMonitor application is available"
 
 asterisk -rx "dialplan reload"
 
@@ -65,14 +97,14 @@ asterisk -rx "dialplan show globals" | grep -E "RECORDINGS_BASE|ENABLE_MIXMONITO
 if asterisk -rx "dialplan show from-webrtc" 2>&1 | grep -q "ALWAYS ON"; then
   echo "OK: from-webrtc has always-on recording"
 else
-  echo "WARN: dialplan may not have reloaded — check: asterisk -rx \"dialplan show from-webrtc\""
+  echo "WARN: check dialplan: asterisk -rx \"dialplan show from-webrtc\""
 fi
 
 if sudo -u asterisk touch "${RECORDINGS}/outgoing/.write-test" 2>/dev/null; then
   rm -f "${RECORDINGS}/outgoing/.write-test"
   echo "OK: asterisk can write to ${RECORDINGS}/outgoing"
 else
-  echo "FAIL: asterisk cannot write to ${RECORDINGS}/outgoing — fix chown/chmod"
+  echo "FAIL: asterisk cannot write to ${RECORDINGS}/outgoing"
   exit 1
 fi
 
@@ -80,5 +112,7 @@ echo ""
 echo "Done. Place a test call, then:"
 echo "  sudo ls -lt ${RECORDINGS}/outgoing/"
 echo ""
-echo "To revert: restore backup:"
-echo "  sudo cp ${BK} ${DST} && sudo asterisk -rx \"dialplan reload\""
+echo "To revert dialplan:"
+echo "  sudo cp ${BK_EXT} ${DST_EXT} && sudo asterisk -rx \"dialplan reload\""
+echo "To revert modules.conf:"
+echo "  sudo cp ${BK_MOD} ${DST_MOD} && sudo systemctl restart asterisk"
