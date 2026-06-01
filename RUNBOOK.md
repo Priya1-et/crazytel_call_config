@@ -36,11 +36,12 @@ sudo asterisk -rx "pjsip show registrations"
 2. **Inbound** — call a Crazytel DID; UI rings; Accept.
 3. **Events** — Network tab: `POST http://localhost:3001/v1/asterisk/events` → **201**.
 
-## Outbound hold / resume
+## Hold / resume (outbound + inbound)
 
-- FE: **Hold** / **Resume** on active outbound call (SIP re-INVITE).
+- FE: **Hold** / **Resume** on active outbound panel and inbound modal (SIP re-INVITE).
+- **Call waiting:** outbound active → inbound → Accept puts outbound on hold automatically.
 - Asterisk: `moh_suggest=crazytel-hold` on `venus` + trunk; install `musiconhold.conf` and add `asterisk/moh/hold-message.wav`.
-- Tests: `docs/OUTBOUND_HOLD_TEST.md`
+- Tests: `docs/OUTBOUND_HOLD_TEST.md`, `docs/INBOUND_HOLD_TEST.md`
 - Deploy: `sudo bash deploy/install-local-asterisk.sh` then `sudo asterisk -rx "moh reload"`
 
 ## Call recording (MixMonitor)
