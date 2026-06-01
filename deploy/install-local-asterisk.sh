@@ -7,7 +7,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ETC="/etc/asterisk"
 TS="$(date +%Y%m%d-%H%M%S)"
 BK="${ETC}/crazytel-backup-${TS}"
-FILES=(pjsip.conf extensions.conf modules.conf rtp.conf http.conf)
+FILES=(pjsip.conf extensions.conf modules.conf rtp.conf http.conf musiconhold.conf)
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "Re-run with sudo: sudo bash $0"
@@ -34,6 +34,14 @@ chown -R asterisk:asterisk /var/spool/asterisk/recordings
 chmod 755 /var/spool/asterisk/recordings /var/spool/asterisk/recordings/incoming /var/spool/asterisk/recordings/outgoing
 echo "Recording dirs: /var/spool/asterisk/recordings/{incoming,outgoing}"
 
+mkdir -p /var/lib/asterisk/moh/crazytel-hold
+if [[ -f "${ROOT}/asterisk/moh/hold-message.wav" ]]; then
+  cp "${ROOT}/asterisk/moh/hold-message.wav" /var/lib/asterisk/moh/crazytel-hold/
+  echo "Installed hold-message.wav -> /var/lib/asterisk/moh/crazytel-hold/"
+fi
+chown -R asterisk:asterisk /var/lib/asterisk/moh
+echo "MOH dir: /var/lib/asterisk/moh/crazytel-hold (add hold-message.wav if missing)"
+
 if ! systemctl is-active --quiet asterisk 2>/dev/null; then
   echo "Starting asterisk service..."
   systemctl start asterisk
@@ -43,6 +51,7 @@ fi
 asterisk -rx "module reload res_http.so" 2>/dev/null || true
 asterisk -rx "dialplan reload"
 asterisk -rx "module reload res_pjsip.so"
+asterisk -rx "moh reload" 2>/dev/null || true
 
 echo ""
 echo "=== Verification ==="
