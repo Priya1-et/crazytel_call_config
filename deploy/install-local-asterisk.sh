@@ -45,7 +45,9 @@ echo "MOH dir: /var/lib/asterisk/moh/crazytel-hold (add hold-message.wav if miss
 mkdir -p /var/lib/asterisk/sounds/custom
 BUSY_SRC=""
 for candidate in \
+  "${ROOT}/asterisk/sounds/consultant_busy_tone.wav" \
   "${ROOT}/asterisk/sounds/consultant_busy.wav" \
+  "${ROOT}/../crazytel_calling_fe/public/sounds/consultant_busy_tone.wav" \
   "${ROOT}/../crazytel_calling_fe/public/sounds/consultant_busy.wav" \
   "${ROOT}/../crazytel_calling_fe/public/sounds/consultaltn_busy.wav"; do
   if [[ -f "${candidate}" ]]; then
@@ -54,10 +56,11 @@ for candidate in \
   fi
 done
 if [[ -n "${BUSY_SRC}" ]]; then
+  cp "${BUSY_SRC}" /var/lib/asterisk/sounds/custom/consultant_busy_tone.wav
   cp "${BUSY_SRC}" /var/lib/asterisk/sounds/custom/consultant-busy.wav
-  echo "Installed consultant-busy.wav from ${BUSY_SRC}"
+  echo "Installed consultant_busy_tone.wav (+ consultant-busy alias) from ${BUSY_SRC}"
 else
-  echo "WARN: No consultant_busy.wav found — add asterisk/sounds/consultant_busy.wav or fe/public/sounds/consultant_busy.wav"
+  echo "WARN: No consultant_busy_tone.wav — add asterisk/sounds/consultant_busy_tone.wav"
 fi
 chown -R asterisk:asterisk /var/lib/asterisk/sounds/custom
 
