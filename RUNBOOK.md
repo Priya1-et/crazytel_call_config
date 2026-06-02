@@ -39,10 +39,17 @@ sudo asterisk -rx "pjsip show registrations"
 ## Hold / resume (outbound + inbound)
 
 - FE: **Hold** / **Resume** on active outbound panel and inbound modal (SIP re-INVITE).
-- **Call waiting:** outbound active → inbound → Accept puts outbound on hold automatically.
-- Asterisk: `moh_suggest=crazytel-hold` on `venus` + trunk; install `musiconhold.conf` and add `asterisk/moh/hold-message.wav`.
+- Asterisk: `moh_suggest=crazytel-hold` on `venus` + trunk; install `musiconhold.conf` and MOH WAVs.
 - Tests: `docs/OUTBOUND_HOLD_TEST.md`, `docs/INBOUND_HOLD_TEST.md`
 - Deploy: `sudo bash deploy/install-local-asterisk.sh` then `sudo asterisk -rx "moh reload"`
+
+## Venus busy queue (User 2 while Venus on a call)
+
+- Announcement `custom/consultant-busy` + MOH loop, max **120s**, then missed call.
+- `device_state_busy_at=1` on `venus` — no parallel browser ring while busy.
+- Set `MISSED_API_URL` in `extensions.conf` `[globals]`; PBX needs **curl**.
+- Audio: `asterisk/sounds/consultant_busy.wav` (see `asterisk/sounds/README.md`).
+- Tests: `docs/BUSY_WAIT_QUEUE.md`
 
 ## Call recording (MixMonitor)
 
