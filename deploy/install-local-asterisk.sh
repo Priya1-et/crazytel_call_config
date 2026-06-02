@@ -81,6 +81,17 @@ asterisk -rx "module reload res_pjsip.so"
 asterisk -rx "moh reload" 2>/dev/null || true
 
 echo ""
+echo "=== Dialplan safety check (must not list System() in extensions.conf) ==="
+if grep -n 'System(' "${ETC}/extensions.conf" 2>/dev/null; then
+  echo "FAIL: extensions.conf still contains System() — calls will drop. Remove it and re-run this script."
+  exit 1
+fi
+echo "OK: no System() in dialplan"
+if ! asterisk -rx "dialplan show sub-route-inbound-consultant" 2>&1 | grep -q 'venus_busy.*Dial'; then
+  echo "WARN: venus_busy Dial not found — run: asterisk -rx \"dialplan show sub-route-inbound-consultant\""
+fi
+
+echo ""
 echo "=== Verification ==="
 if asterisk -rx "pjsip show endpoint venus" 2>&1 | grep -q "Unable to find"; then
   echo "FAIL: endpoint venus not loaded"

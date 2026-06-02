@@ -4,10 +4,11 @@
 
 1. **User 1 ↔ Venus** — normal call (unchanged).
 2. **User 2/3** calls DID while Venus busy:
-   - Hears `consultant_busy_tone` announcement (fallback `consultant-busy`) → hold music → repeats.
-   - Venus browser gets **call-waiting** popup (SIP INVITE) after the announcement; accept disconnects the current call.
-   - Up to **120 seconds** (`BUSY_WAIT_MAX_SEC` in `[globals]`).
-3. If Venus becomes free → rings Venus (browser) → normal inbound accept flow.
+   - Hears short announcement (`consultant_busy_tone` / `consultant-busy`).
+   - Asterisk **rings Venus in the browser** (same incoming-call UI as normal).
+   - Venus **Accept** or **Reject**; no answer in 45s → missed.
+   - Caller hears hold music while Venus phone is ringing (`m(crazytel-hold)` on Dial).
+3. No `System()` in dialplan — use `sudo bash deploy/install-local-asterisk.sh` after every pull.
 4. If **timeout**, **User 2 hangs up**, or Venus does not answer → **missed call** (API + red list in UI).
 
 ## Audio files
