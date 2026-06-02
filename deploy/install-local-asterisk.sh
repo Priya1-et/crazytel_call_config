@@ -70,7 +70,12 @@ if ! systemctl is-active --quiet asterisk 2>/dev/null; then
   sleep 2
 fi
 
+asterisk -rx "module load res_curl.so" 2>/dev/null || true
+asterisk -rx "module load func_curl.so" 2>/dev/null || true
+asterisk -rx "module load app_system.so" 2>/dev/null || true
+asterisk -rx "module load app_wait.so" 2>/dev/null || true
 asterisk -rx "module reload res_http.so" 2>/dev/null || true
+asterisk -rx "module reload" 2>/dev/null || true
 asterisk -rx "dialplan reload"
 asterisk -rx "module reload res_pjsip.so"
 asterisk -rx "moh reload" 2>/dev/null || true
