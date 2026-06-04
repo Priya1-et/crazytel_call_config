@@ -70,6 +70,8 @@ if ! systemctl is-active --quiet asterisk 2>/dev/null; then
   sleep 2
 fi
 
+asterisk -rx "module load codec_alaw.so" 2>/dev/null || true
+asterisk -rx "module load codec_ulaw.so" 2>/dev/null || true
 asterisk -rx "module load res_curl.so" 2>/dev/null || true
 asterisk -rx "module load func_curl.so" 2>/dev/null || true
 asterisk -rx "module load app_system.so" 2>/dev/null || true
@@ -87,6 +89,9 @@ if grep -n 'System(' "${ETC}/extensions.conf" 2>/dev/null; then
   exit 1
 fi
 echo "OK: no System() in dialplan"
+if ! asterisk -rx "core show translation" 2>&1 | grep -qE 'alaw.*ulaw|ulaw.*alaw'; then
+  echo "WARN: alaw<->ulaw translation missing — run: asterisk -rx \"module load codec_alaw.so\" && asterisk -rx \"core show translation\""
+fi
 if ! asterisk -rx "dialplan show sub-route-inbound-consultant" 2>&1 | grep -q 'venus_busy.*Dial'; then
   echo "WARN: venus_busy Dial not found — run: asterisk -rx \"dialplan show sub-route-inbound-consultant\""
 fi
