@@ -16,7 +16,7 @@ Fill these from the **Crazytel portal** / support. Nothing from IAGU should be c
 - [ ] **Inbound identify**: `match=sip.biz.crazytel.net.au` **and** uncomment/add Crazytel **SBC IP** `match=` lines in `pjsip.conf` (hostname alone is often insufficient).
 - [ ] **International** outbound enabled on Crazytel account if using `0011…` dial patterns.
 - [ ] **Username/password trunk** only if Crazytel rejects IP auth — use commented blocks in `pjsip.conf`.
-- [x] **Codecs**: trunk **ulaw/alaw**; WebRTC **Opus + ulaw** on `venus`.
+- [x] **Codecs**: trunk **ulaw/alaw**; WebRTC **venus ulaw/alaw only** (G.711 — AU national + India intl; no Opus on venus).
 
 ## TLS / WebRTC (browser)
 
